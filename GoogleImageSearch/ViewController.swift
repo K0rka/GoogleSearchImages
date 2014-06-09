@@ -8,7 +8,8 @@
 
 import UIKit
 
-class ViewController: UICollectionViewController, UICollectionViewDataSource, UICollectionViewDelegate {
+class ViewController: UICollectionViewController,
+                    UICollectionViewDataSource, UICollectionViewDelegate {
     var foundObjects : NSMutableArray!;
     var headerView : HeaderViewClass!;
     init(coder aDecoder: NSCoder!) {
@@ -22,7 +23,7 @@ class ViewController: UICollectionViewController, UICollectionViewDataSource, UI
     
     @IBAction func onButtonPressed(sender : UIButton) {
         var searchString = self.headerView.searchTextField.text;
-        var baseString = "https://ajax.googleapis.com/ajax/services/search/images?v=1.0&q="
+        var baseString = "https://ajax.googleapis.com/ajax/services/search/images?v=1.0&q=";
         var finalString = baseString.stringByAppendingString(searchString);
         var url  = NSURL.URLWithString(finalString);
         var request : NSURLRequest = NSURLRequest(URL: url);
@@ -30,27 +31,22 @@ class ViewController: UICollectionViewController, UICollectionViewDataSource, UI
             dispatch_async(dispatch_get_main_queue(),
                 {
                     var error : NSErrorPointer;
-                    var responseJson : NSDictionary = NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions.MutableContainers, error: nil) as NSDictionary;
+                    var responseJson : NSDictionary = NSJSONSerialization.JSONObjectWithData(data,
+                        options : NSJSONReadingOptions.MutableContainers,
+                        error: nil) as NSDictionary;
                     var results: NSDictionary = responseJson["responseData"] as NSDictionary
-//                    results = results["responseData"] as NSDictionary;
                     self.foundObjects = NSMutableArray(array: results["results"] as NSArray);
                     println("response = \(self.foundObjects)");
-                    NSLog("resp ");
-                    self.collectionView.reloadData()
+                    self.collectionView.reloadData();
                 });
             });
         
     }
     
     override func viewDidLoad() {
-        super.viewDidLoad()
-        self.foundObjects = NSMutableArray(capacity: 10)
+        super.viewDidLoad();
+        self.foundObjects = NSMutableArray(capacity: 10);
         // Do any additional setup after loading the view, typically from a nib.
-    }
-    
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
     }
     
     override func collectionView(collectionView: UICollectionView!, numberOfItemsInSection section: Int) -> Int {
@@ -73,14 +69,14 @@ class ViewController: UICollectionViewController, UICollectionViewDataSource, UI
         }
         else {
             newCell.backgroundColor = UIColor.blueColor();
-        }
+        }        
         return newCell ;
     }
     override func collectionView(collectionView: UICollectionView!, viewForSupplementaryElementOfKind kind: String!, atIndexPath indexPath: NSIndexPath!) -> UICollectionReusableView! {
         var reusableview:UICollectionReusableView! = nil ;
         
         if ( kind == UICollectionElementKindSectionHeader ) {
-            var headerView:UICollectionReusableView! = collectionView.dequeueReusableSupplementaryViewOfKind(kind, withReuseIdentifier: "HeaderViewIdtf", forIndexPath: indexPath) as UICollectionReusableView;
+            var headerView:UICollectionReusableView! = collectionView.dequeueReusableSupplementaryViewOfKind(kind, withReuseIdentifier: "HeaderViewId", forIndexPath: indexPath) as UICollectionReusableView;
             reusableview = headerView;
             self.headerView = headerView as HeaderViewClass;
         }
