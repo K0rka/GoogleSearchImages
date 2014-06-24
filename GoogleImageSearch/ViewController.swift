@@ -17,27 +17,36 @@ class ViewController: UICollectionViewController,
     }
     init(nibName nibNameOrNil: String!, bundle nibBundleOrNil: NSBundle!) {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil);
-        self.headerView = nil;
-        self.foundObjects = NSMutableArray(capacity: 10);
+
     }
     
     @IBAction func onButtonPressed(sender : UIButton) {
         var searchString = self.headerView.searchTextField.text;
         var baseString = "https://ajax.googleapis.com/ajax/services/search/images?v=1.0&q=";
         var finalString = baseString.stringByAppendingString(searchString);
-        var url  = NSURL.URLWithString(finalString);
+        var encodedString  = finalString.stringByAddingPercentEscapesUsingEncoding(NSUTF8StringEncoding);
+        var url  = NSURL.URLWithString(encodedString);
         var request : NSURLRequest = NSURLRequest(URL: url);
+        println(finalString);
+        println(url);
+        println(request);
         NSURLConnection.sendAsynchronousRequest(request, queue: NSOperationQueue(), completionHandler:{response,data,error in
             dispatch_async(dispatch_get_main_queue(),
                 {
-                    var error : NSErrorPointer;
-                    var responseJson : NSDictionary = NSJSONSerialization.JSONObjectWithData(data,
-                        options : NSJSONReadingOptions.MutableContainers,
-                        error: nil) as NSDictionary;
-                    var results: NSDictionary = responseJson["responseData"] as NSDictionary
-                    self.foundObjects = NSMutableArray(array: results["results"] as NSArray);
-                    println("response = \(self.foundObjects)");
-                    self.collectionView.reloadData();
+                    if error {
+                        println(response);
+                        println(error);
+                    }
+                    else {
+                        //                    var parseError : NSErrorPointer;
+                        var responseJson : NSDictionary = NSJSONSerialization.JSONObjectWithData(data,
+                            options : NSJSONReadingOptions.MutableContainers,
+                            error: nil) as NSDictionary;
+                        var results: NSDictionary = responseJson["responseData"] as NSDictionary
+                        self.foundObjects = NSMutableArray(array: results["results"] as NSArray);
+                        println("response = \(self.foundObjects)");
+                        self.collectionView.reloadData();
+                    }
                 });
             });
         
@@ -46,7 +55,9 @@ class ViewController: UICollectionViewController,
     override func viewDidLoad() {
         super.viewDidLoad();
         self.foundObjects = NSMutableArray(capacity: 10);
+        self.headerView = nil;
         // Do any additional setup after loading the view, typically from a nib.
+        self.title = "Search";
     }
     
     override func collectionView(collectionView: UICollectionView!, numberOfItemsInSection section: Int) -> Int {
